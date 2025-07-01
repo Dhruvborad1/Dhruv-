@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker | Manage Your Finances</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .time-display {
+            background-color: var(--light-gray);
+            color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+
+        .summary-card h3 {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .summary-card .amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .summary-card .secondary {
+            color: var(--secondary);
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .expense-table th,
+        .expense-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .expense-table th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .expense-table tr:nth-child(even) {
+            background-color: var(--light);
+        }
+
+        .expense-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--light-gray);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--light-gray);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .pdf-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Animation for form submission */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
+            <p>Track your expenses, manage your budget, and download reports</p>
+        </header>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <h3>Weekly Expenses</h3>
+                <div class="amount" id="weekly-total">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <h3>Monthly Expenses</h3>
+                <div class="amount secondary" id="monthly-total">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Expenses</h3>
+                <div class="amount" id="total-expenses">$0.00</div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Add Expense</h2>
+                    <div id="current-time">12:00:00 PM</div>
+                </div>
+                <form id="expense-form">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Expense Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter expense name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="text" id="time" class="form-control time-display" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount ($)</label>
+                        <input type="number" id="amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Expense Records</h2>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="all">All</button>
+                        <button class="tab-btn" data-tab="week">This Week</button>
+                        <button class="tab-btn" data-tab="month">This Month</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="expense-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Time</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-list">
+                            <!-- Expenses will be populated here -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No expenses recorded yet</h3>
+                        <p>Add your first expense to get started</p>
+                    </div>
+                </div>
+                <div class="pdf-section">
+                    <button id="download-week" class="btn btn-outline">
+                        <i class="fas fa-download"></i> Download Weekly PDF
+                    </button>
+                    <button id="download-month" class="btn btn-outline">
+                        <i class="fas fa-download"></i> Download Monthly PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2023 Expense Tracker | Track your finances with ease</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const expenseForm = document.getElementById('expense-form');
+        const expenseList = document.getElementById('expense-list');
+        const emptyState = document.getElementById('empty-state');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const timeInput = document.getElementById('time');
+        const dateInput = document.getElementById('date');
+        const weeklyTotal = document.getElementById('weekly-total');
+        const monthlyTotal = document.getElementById('monthly-total');
+        const totalExpenses = document.getElementById('total-expenses');
+        const downloadWeekBtn = document.getElementById('download-week');
+        const downloadMonthBtn = document.getElementById('download-month');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+
+        // Initialize with current date and time
+        function initDateTime() {
+            const now = new Date();
+            const dateString = now.toISOString().split('T')[0];
+            dateInput.value = dateString;
+            updateTime();
+        }
+
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            currentTimeDisplay.textContent = timeString;
+            timeInput.value = timeString;
+        }
+
+        // Update time immediately and then every second
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Initialize app
+        initDateTime();
+
+        // Expense data structure
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        // Save expenses to localStorage
+        function saveExpenses() {
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            renderExpenses();
+            updateSummary();
+        }
+
+        // Add expense
+        function addExpense(e) {
+            e.preventDefault();
+            
+            const date = dateInput.value;
+            const name = document.getElementById('name').value;
+            const time = timeInput.value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            
+            if (!date || !name || !amount) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const expense = {
+                id: Date.now(),
+                date,
+                name,
+                time,
+                amount
+            };
+            
+            expenses.push(expense);
+            saveExpenses();
+            
+            // Reset form
+            expenseForm.reset();
+            dateInput.value = new Date().toISOString().split('T')[0];
+            updateTime();
+            
+            // Add animation effect
+            expenseForm.classList.add('pulse');
+            setTimeout(() => expenseForm.classList.remove('pulse'), 500);
+        }
+
+        // Delete expense
+        function deleteExpense(id) {
+            if (!confirm('Are you sure you want to delete this expense?')) return;
+            
+            expenses = expenses.filter(expense => expense.id !== id);
+            saveExpenses();
+        }
+
+        // Edit expense
+        function editExpense(id) {
+            const expense = expenses.find(exp => exp.id === id);
+            if (!expense) return;
+            
+            document.getElementById('date').value = expense.date;
+            document.getElementById('name').value = expense.name;
+            document.getElementById('amount').value = expense.amount;
+            
+            // Remove the expense from the list
+            expenses = expenses.filter(exp => exp.id !== id);
+            saveExpenses();
+        }
+
+        // Render expenses
+        function renderExpenses(filter = 'all') {
+            // Filter expenses
+            let filteredExpenses = [...expenses];
+            
+            if (filter === 'week') {
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                filteredExpenses = expenses.filter(expense => {
+                    const expenseDate = new Date(expense.date);
+                    return expenseDate >= oneWeekAgo;
+                });
+            } else if (filter === 'month') {
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                filteredExpenses = expenses.filter(expense => {
+                    const expenseDate = new Date(expense.date);
+                    return expenseDate >= oneMonthAgo;
+                });
+            }
+            
+            // Sort by date (newest first)
+            filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Render expenses
+            if (filteredExpenses.length === 0) {
+                expenseList.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            expenseList.innerHTML = filteredExpenses.map(expense => `
+                <tr>
+                    <td>${formatDate(expense.date)}</td>
+                    <td>${expense.name}</td>
+                    <td>${expense.time}</td>
+                    <td>$${expense.amount.toFixed(2)}</td>
+                    <td class="actions">
+                        <button onclick="editExpense(${expense.id})" class="btn btn-outline btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteExpense(${expense.id})" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Update summary cards
+        function updateSummary() {
+            // Calculate weekly total
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const weekly = expenses.reduce((total, expense) => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate >= oneWeekAgo ? total + expense.amount : total;
+            }, 0);
+            
+            // Calculate monthly total
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            const monthly = expenses.reduce((total, expense) => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate >= oneMonthAgo ? total + expense.amount : total;
+            }, 0);
+            
+            // Calculate total expenses
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            
+            // Update DOM
+            weeklyTotal.textContent = `$${weekly.toFixed(2)}`;
+            monthlyTotal.textContent = `$${monthly.toFixed(2)}`;
+            totalExpenses.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Generate PDF
+        function generatePDF(period) {
+            // Get filtered expenses
+            let filteredExpenses = [...expenses];
+            let title = 'All Expenses';
+            
+            if (period === 'week') {
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                filteredExpenses = expenses.filter(expense => {
+                    const expenseDate = new Date(expense.date);
+                    return expenseDate >= oneWeekAgo;
+                });
+                title = 'Weekly Expense Report';
+            } else if (period === 'month') {
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                filteredExpenses = expenses.filter(expense => {
+                    const expenseDate = new Date(expense.date);
+                    return expenseDate >= oneMonthAgo;
+                });
+                title = 'Monthly Expense Report';
+            }
+            
+            // Prepare data for PDF
+            const doc = new jspdf.jsPDF();
+            const tableData = filteredExpenses.map(expense => [
+                formatDate(expense.date),
+                expense.name,
+                expense.time,
+                `$${expense.amount.toFixed(2)}`
+            ]);
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text(title, 14, 15);
+            
+            // Add table
+            doc.autoTable({
+                head: [['Date', 'Expense Name', 'Time', 'Amount']],
+                body: tableData,
+                startY: 25,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [67, 97, 238],
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 3
+                }
+            });
+            
+            // Add total
+            const total = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const finalY = doc.lastAutoTable.finalY || 25;
+            doc.setFontSize(12);
+            doc.text(`Total: $${total.toFixed(2)}`, 14, finalY + 10);
+            
+            // Save the PDF
+            doc.save(`expense-report-${period}-${new Date().toISOString().slice(0, 10)}.pdf`);
+        }
+
+        // Event Listeners
+        expenseForm.addEventListener('submit', addExpense);
+        downloadWeekBtn.addEventListener('click', () => generatePDF('week'));
+        downloadMonthBtn.addEventListener('click', () => generatePDF('month'));
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderExpenses(button.dataset.tab);
+            });
+        });
+
+        // Initial render
+        renderExpenses();
+        updateSummary();
+    </script>
+</body>
+</html>
