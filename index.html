@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker | Mobile First</title>
+    <title>Expense Tracker | Manage Your Finances</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -169,6 +169,15 @@
             background-color: var(--primary-dark);
         }
 
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+
         .btn-danger {
             background-color: var(--danger);
             color: white;
@@ -322,27 +331,50 @@
             font-size: 0.85rem;
         }
 
-        /* Mobile menu */
-        .mobile-header {
+        /* Modal styling for edit form */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            margin-bottom: 20px;
         }
 
-        .menu-toggle {
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .close-modal {
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: var(--primary);
             cursor: pointer;
-            display: block;
-        }
-
-        @media (min-width: 768px) {
-            .menu-toggle {
-                display: none;
-            }
+            color: var(--gray);
         }
 
         /* Animation for form submission */
@@ -359,14 +391,6 @@
 </head>
 <body>
     <div class="container">
-        <div class="mobile-header">
-            <button class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
-            <div></div> <!-- Spacer for alignment -->
-        </div>
-
         <header>
             <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
             <p>Track your expenses, manage your budget, and download reports</p>
@@ -457,6 +481,43 @@
             </div>
         </div>
 
+        <!-- Edit Expense Modal -->
+        <div id="edit-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title"><i class="fas fa-edit"></i> Edit Expense</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <form id="edit-expense-form">
+                    <input type="hidden" id="edit-id">
+                    <div class="form-group">
+                        <label for="edit-date">Date</label>
+                        <input type="date" id="edit-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-name">Expense Name</label>
+                        <input type="text" id="edit-name" class="form-control" placeholder="Enter expense name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-time">Time</label>
+                        <input type="text" id="edit-time" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-amount">Amount ($)</label>
+                        <input type="number" id="edit-amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button type="button" id="cancel-edit" class="btn btn-outline" style="flex: 1;">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <footer>
             <p>© 2023 Expense Tracker | Track your finances with ease</p>
         </footer>
@@ -476,6 +537,10 @@
         const downloadWeekBtn = document.getElementById('download-week');
         const downloadMonthBtn = document.getElementById('download-month');
         const tabButtons = document.querySelectorAll('.tab-btn');
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-expense-form');
+        const closeModalBtn = document.querySelector('.close-modal');
+        const cancelEditBtn = document.getElementById('cancel-edit');
 
         // Initialize with current date and time
         function initDateTime() {
@@ -553,18 +618,51 @@
             saveExpenses();
         }
 
-        // Edit expense
-        function editExpense(id) {
+        // Open edit modal
+        function openEditModal(id) {
             const expense = expenses.find(exp => exp.id === id);
             if (!expense) return;
             
-            document.getElementById('date').value = expense.date;
-            document.getElementById('name').value = expense.name;
-            document.getElementById('amount').value = expense.amount;
+            // Fill the edit form with expense data
+            document.getElementById('edit-id').value = expense.id;
+            document.getElementById('edit-date').value = expense.date;
+            document.getElementById('edit-name').value = expense.name;
+            document.getElementById('edit-time').value = expense.time;
+            document.getElementById('edit-amount').value = expense.amount;
             
-            // Remove the expense from the list
-            expenses = expenses.filter(exp => exp.id !== id);
-            saveExpenses();
+            // Show the modal
+            editModal.style.display = 'flex';
+        }
+
+        // Save edited expense
+        function saveEditedExpense(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('edit-id').value);
+            const date = document.getElementById('edit-date').value;
+            const name = document.getElementById('edit-name').value;
+            const time = document.getElementById('edit-time').value;
+            const amount = parseFloat(document.getElementById('edit-amount').value);
+            
+            if (!date || !name || !time || !amount) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Update the expense
+            const index = expenses.findIndex(exp => exp.id === id);
+            if (index !== -1) {
+                expenses[index] = { id, date, name, time, amount };
+                saveExpenses();
+            }
+            
+            // Close the modal
+            editModal.style.display = 'none';
+        }
+
+        // Close modal
+        function closeModal() {
+            editModal.style.display = 'none';
         }
 
         // Render expenses
@@ -607,7 +705,7 @@
                     <td>${expense.time}</td>
                     <td>$${expense.amount.toFixed(2)}</td>
                     <td class="actions">
-                        <button onclick="editExpense(${expense.id})" class="btn btn-outline btn-sm">
+                        <button onclick="openEditModal(${expense.id})" class="btn btn-outline btn-sm">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="deleteExpense(${expense.id})" class="btn btn-danger btn-sm">
@@ -726,6 +824,18 @@
                 button.classList.add('active');
                 renderExpenses(button.dataset.tab);
             });
+        });
+        
+        // Edit form handling
+        editForm.addEventListener('submit', saveEditedExpense);
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelEditBtn.addEventListener('click', closeModal);
+        
+        // Close modal when clicking outside the content
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                closeModal();
+            }
         });
 
         // Initial render
