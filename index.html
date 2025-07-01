@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker | Manage Your Finances</title>
+    <title>Expense Tracker | Mobile First</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -34,7 +34,7 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             color: var(--dark);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
 
         .container {
@@ -44,33 +44,36 @@
 
         header {
             text-align: center;
-            padding: 30px 0;
-            margin-bottom: 30px;
+            padding: 20px 0;
+            margin-bottom: 20px;
         }
 
         header h1 {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 700;
         }
 
         header p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--gray);
             max-width: 600px;
             margin: 0 auto;
         }
 
         .dashboard {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        @media (min-width: 992px) {
+        @media (min-width: 768px) {
             .dashboard {
-                grid-template-columns: 1fr 2fr;
+                flex-direction: row;
+            }
+            .dashboard > div {
+                flex: 1;
             }
         }
 
@@ -78,12 +81,13 @@
             background: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 25px;
+            padding: 20px;
             transition: var(--transition);
+            margin-bottom: 15px;
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
         }
 
@@ -91,34 +95,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--light-gray);
         }
 
         .card-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--dark);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
             color: var(--gray);
+            font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid var(--light-gray);
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: var(--transition);
         }
 
@@ -135,17 +140,24 @@
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
+            width: 100%;
+        }
+
+        @media (min-width: 480px) {
+            .btn {
+                width: auto;
+            }
         }
 
         .btn-primary {
@@ -178,33 +190,33 @@
         }
 
         .btn-sm {
-            padding: 6px 12px;
+            padding: 5px 10px;
             font-size: 0.85rem;
         }
 
         .summary-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .summary-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             box-shadow: var(--box-shadow);
         }
 
         .summary-card h3 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--gray);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .summary-card .amount {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--primary);
         }
@@ -213,15 +225,21 @@
             color: var(--secondary);
         }
 
+        .table-container {
+            overflow-x: auto;
+        }
+
         .expense-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
 
         .expense-table th,
         .expense-table td {
-            padding: 12px 15px;
+            padding: 10px 12px;
             text-align: left;
+            font-size: 0.9rem;
         }
 
         .expense-table th {
@@ -240,36 +258,41 @@
 
         .actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+        }
+
+        .actions .btn-sm {
+            flex: 1;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 15px;
             color: var(--gray);
         }
 
         .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
             color: var(--light-gray);
         }
 
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             background-color: var(--light-gray);
             border: none;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            font-size: 0.85rem;
         }
 
         .tab-btn.active {
@@ -279,17 +302,47 @@
 
         .pdf-section {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 480px) {
+            .pdf-section {
+                flex-direction: row;
+                justify-content: center;
+            }
         }
 
         footer {
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
+            margin-top: 30px;
+            padding: 15px;
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        /* Mobile menu */
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            display: block;
+        }
+
+        @media (min-width: 768px) {
+            .menu-toggle {
+                display: none;
+            }
         }
 
         /* Animation for form submission */
@@ -306,6 +359,14 @@
 </head>
 <body>
     <div class="container">
+        <div class="mobile-header">
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
+            <div></div> <!-- Spacer for alignment -->
+        </div>
+
         <header>
             <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
             <p>Track your expenses, manage your budget, and download reports</p>
@@ -360,8 +421,8 @@
                     <h2 class="card-title">Expense Records</h2>
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="all">All</button>
-                        <button class="tab-btn" data-tab="week">This Week</button>
-                        <button class="tab-btn" data-tab="month">This Month</button>
+                        <button class="tab-btn" data-tab="week">Week</button>
+                        <button class="tab-btn" data-tab="month">Month</button>
                     </div>
                 </div>
                 <div class="table-container">
@@ -387,10 +448,10 @@
                 </div>
                 <div class="pdf-section">
                     <button id="download-week" class="btn btn-outline">
-                        <i class="fas fa-download"></i> Download Weekly PDF
+                        <i class="fas fa-download"></i> Weekly PDF
                     </button>
                     <button id="download-month" class="btn btn-outline">
-                        <i class="fas fa-download"></i> Download Monthly PDF
+                        <i class="fas fa-download"></i> Monthly PDF
                     </button>
                 </div>
             </div>
