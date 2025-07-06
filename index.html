@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker | Manage Your Finances</title>
+    <title>Expense Tracker | Enhanced Monthly Filter</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -46,6 +46,7 @@
             text-align: center;
             padding: 20px 0;
             margin-bottom: 20px;
+            position: relative;
         }
 
         header h1 {
@@ -234,6 +235,12 @@
             color: var(--secondary);
         }
 
+        .summary-card .period {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -387,6 +394,195 @@
         .pulse {
             animation: pulse 0.5s ease;
         }
+        
+        /* New styles for monthly filter */
+        .month-filter {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center;
+        }
+        
+        .month-filter select {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .month-display {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-left: 10px;
+        }
+        
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .nav-buttons button {
+            background: var(--light-gray);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .nav-buttons button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+/* Language Selector */
+.language-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.lang-dropdown {
+    position: relative;
+    width: 140px;
+}
+
+.lang-current {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid var(--light-gray);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.lang-current:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.lang-flag {
+    font-size: 1.1rem;
+}
+
+.lang-text {
+    flex: 1;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lang-current i {
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+
+.lang-dropdown.active .lang-current i {
+    transform: rotate(180deg);
+}
+
+.lang-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 160px;
+    background: rgb(255, 255, 255);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 8px 0;
+    margin-top: 5px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+}
+
+.lang-dropdown.active .lang-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.lang-option:hover {
+    background-color: #7b8ee196;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .language-selector {
+        top: -5px;
+        right: -5px;
+    }
+    
+    .lang-dropdown {
+        width: 120px;
+    }
+    
+    .lang-current {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .lang-options {
+        width: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .language-selector {
+        top: -5px;
+        right: -5px;
+    }
+    
+    .lang-dropdown {
+        width: 45px;
+    }
+    
+    .lang-text {
+        display: none;
+    }
+    
+    .lang-current i {
+        display: none;
+    }
+    
+    .lang-options {
+        width: 120px;
+    }
+}
     </style>
 </head>
 <body>
@@ -394,20 +590,47 @@
         <header>
             <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
             <p>Track your expenses, manage your budget, and download reports</p>
+            
+            <div class="language-selector">
+    <div class="lang-dropdown">
+        <button class="lang-current">
+            <span class="lang-flag">🌐</span>
+            <span class="lang-text">English</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="lang-options">
+            <button class="lang-option" data-lang="en">
+                <span class="lang-flag">EN</span>
+                <span class="lang-text">English</span>
+            </button>
+            <button class="lang-option" data-lang="hi">
+                <span class="lang-flag">HI</span>
+                <span class="lang-text">हिंदी</span>
+            </button>
+            <button class="lang-option" data-lang="gu">
+                <span class="lang-flag">GU</span>
+                <span class="lang-text">ગુજરાતી</span>
+            </button>
+        </div>
+    </div>
+</div>
         </header>
 
         <div class="summary-cards">
             <div class="summary-card">
                 <h3>Weekly Expenses</h3>
                 <div class="amount" id="weekly-total">$0.00</div>
+                <div class="period" id="weekly-period">This week</div>
             </div>
             <div class="summary-card">
                 <h3>Monthly Expenses</h3>
                 <div class="amount secondary" id="monthly-total">$0.00</div>
+                <div class="period" id="monthly-period">This month</div>
             </div>
             <div class="summary-card">
                 <h3>Total Expenses</h3>
                 <div class="amount" id="total-expenses">$0.00</div>
+                <div class="period" id="total-period">All time</div>
             </div>
         </div>
 
@@ -449,6 +672,18 @@
                         <button class="tab-btn" data-tab="month">Month</button>
                     </div>
                 </div>
+                
+                <!-- Monthly Filter Section -->
+                <div id="month-filter-section" style="display: none;">
+                    <div class="filter-header">
+                        <h3 class="month-display" id="month-display">July 2023</h3>
+                        <div class="nav-buttons">
+                            <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="table-container">
                     <table class="expense-table">
                         <thead>
@@ -471,6 +706,9 @@
                     </div>
                 </div>
                 <div class="pdf-section">
+                    <button id="download-all" class="btn btn-outline">
+                        <i class="fas fa-download"></i> Yearly PDF
+                    </button>
                     <button id="download-week" class="btn btn-outline">
                         <i class="fas fa-download"></i> Weekly PDF
                     </button>
@@ -519,7 +757,7 @@
         </div>
 
         <footer>
-            <p>© 2023 Expense Tracker | Track your finances with ease</p>
+            <p>© 2023 Expense Tracker | Enhanced Monthly Filter</p>
         </footer>
     </div>
 
@@ -534,6 +772,10 @@
         const weeklyTotal = document.getElementById('weekly-total');
         const monthlyTotal = document.getElementById('monthly-total');
         const totalExpenses = document.getElementById('total-expenses');
+        const weeklyPeriod = document.getElementById('weekly-period');
+        const monthlyPeriod = document.getElementById('monthly-period');
+        const totalPeriod = document.getElementById('total-period');
+        const downloadAllBtn = document.getElementById('download-all');
         const downloadWeekBtn = document.getElementById('download-week');
         const downloadMonthBtn = document.getElementById('download-month');
         const tabButtons = document.querySelectorAll('.tab-btn');
@@ -541,6 +783,11 @@
         const editForm = document.getElementById('edit-expense-form');
         const closeModalBtn = document.querySelector('.close-modal');
         const cancelEditBtn = document.getElementById('cancel-edit');
+        const monthFilterSection = document.getElementById('month-filter-section');
+        const monthDisplay = document.getElementById('month-display');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const langButtons = document.querySelectorAll('.lang-btn');
 
         // Initialize with current date and time
         function initDateTime() {
@@ -567,6 +814,13 @@
 
         // Expense data structure
         let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        
+        // Month filter state
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        // Language state
+        let currentLang = 'en';
 
         // Save expenses to localStorage
         function saveExpenses() {
@@ -665,24 +919,92 @@
             editModal.style.display = 'none';
         }
 
+        // Get start and end of current week
+        function getWeekRange() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0 (Sunday) to 6 (Saturday)
+            const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // days to subtract to get to Monday
+            
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - diffToMonday);
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const endOfWeek = new Date(now);
+            endOfWeek.setDate(now.getDate() + (6 - diffToMonday));
+            endOfWeek.setHours(23, 59, 59, 999);
+            
+            return { start: startOfWeek, end: endOfWeek };
+        }
+
+        // Get start and end of current month
+        function getMonthRange() {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            endOfMonth.setHours(23, 59, 59, 999);
+            
+            return { start: startOfMonth, end: endOfMonth };
+        }
+
+        // Get start and end of selected month
+        function getSelectedMonthRange() {
+            const startOfMonth = new Date(currentYear, currentMonth, 1);
+            const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+            endOfMonth.setHours(23, 59, 59, 999);
+            
+            return { start: startOfMonth, end: endOfMonth };
+        }
+
+        // Get start and end of current year
+        function getYearRange() {
+            const now = new Date();
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            const endOfYear = new Date(now.getFullYear(), 11, 31);
+            endOfYear.setHours(23, 59, 59, 999);
+            
+            return { start: startOfYear, end: endOfYear };
+        }
+
+        // Update month display
+        function updateMonthDisplay() {
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+            monthDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        }
+
+        // Update period labels
+        function updatePeriodLabels() {
+            const now = new Date();
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+            
+            // Update weekly period
+            const { start: weekStart } = getWeekRange();
+            weeklyPeriod.textContent = `${formatDate(weekStart)} - ${formatDate(new Date())}`;
+            
+            // Update monthly period
+            monthlyPeriod.textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+            
+            // Update total period
+            totalPeriod.textContent = "All time";
+        }
+
         // Render expenses
         function renderExpenses(filter = 'all') {
             // Filter expenses
             let filteredExpenses = [...expenses];
             
             if (filter === 'week') {
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                const { start, end } = getWeekRange();
                 filteredExpenses = expenses.filter(expense => {
                     const expenseDate = new Date(expense.date);
-                    return expenseDate >= oneWeekAgo;
+                    return expenseDate >= start && expenseDate <= end;
                 });
             } else if (filter === 'month') {
-                const oneMonthAgo = new Date();
-                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                const { start, end } = getSelectedMonthRange();
                 filteredExpenses = expenses.filter(expense => {
                     const expenseDate = new Date(expense.date);
-                    return expenseDate >= oneMonthAgo;
+                    return expenseDate >= start && expenseDate <= end;
                 });
             }
             
@@ -718,26 +1040,25 @@
 
         // Format date for display
         function formatDate(dateString) {
+            const date = new Date(dateString);
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString(undefined, options);
+            return date.toLocaleDateString(undefined, options);
         }
 
         // Update summary cards
         function updateSummary() {
             // Calculate weekly total
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const { start: weekStart, end: weekEnd } = getWeekRange();
             const weekly = expenses.reduce((total, expense) => {
                 const expenseDate = new Date(expense.date);
-                return expenseDate >= oneWeekAgo ? total + expense.amount : total;
+                return expenseDate >= weekStart && expenseDate <= weekEnd ? total + expense.amount : total;
             }, 0);
             
             // Calculate monthly total
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            const { start: monthStart, end: monthEnd } = getMonthRange();
             const monthly = expenses.reduce((total, expense) => {
                 const expenseDate = new Date(expense.date);
-                return expenseDate >= oneMonthAgo ? total + expense.amount : total;
+                return expenseDate >= monthStart && expenseDate <= monthEnd ? total + expense.amount : total;
             }, 0);
             
             // Calculate total expenses
@@ -747,6 +1068,9 @@
             weeklyTotal.textContent = `$${weekly.toFixed(2)}`;
             monthlyTotal.textContent = `$${monthly.toFixed(2)}`;
             totalExpenses.textContent = `$${total.toFixed(2)}`;
+            
+            // Update period labels
+            updatePeriodLabels();
         }
 
         // Generate PDF
@@ -754,23 +1078,32 @@
             // Get filtered expenses
             let filteredExpenses = [...expenses];
             let title = 'All Expenses';
+            let dateRange = '';
             
             if (period === 'week') {
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                const { start, end } = getWeekRange();
                 filteredExpenses = expenses.filter(expense => {
                     const expenseDate = new Date(expense.date);
-                    return expenseDate >= oneWeekAgo;
+                    return expenseDate >= start && expenseDate <= end;
                 });
                 title = 'Weekly Expense Report';
+                dateRange = formatDate(start) + ' - ' + formatDate(end);
             } else if (period === 'month') {
-                const oneMonthAgo = new Date();
-                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                const { start, end } = getSelectedMonthRange();
                 filteredExpenses = expenses.filter(expense => {
                     const expenseDate = new Date(expense.date);
-                    return expenseDate >= oneMonthAgo;
+                    return expenseDate >= start && expenseDate <= end;
                 });
                 title = 'Monthly Expense Report';
+                dateRange = formatDate(start) + ' - ' + formatDate(end);
+            } else if (period === 'year') {
+                const { start, end } = getYearRange();
+                filteredExpenses = expenses.filter(expense => {
+                    const expenseDate = new Date(expense.date);
+                    return expenseDate >= start && expenseDate <= end;
+                });
+                title = 'Yearly Expense Report';
+                dateRange = `${start.getFullYear()} Report`;
             }
             
             // Prepare data for PDF
@@ -786,11 +1119,16 @@
             doc.setFontSize(18);
             doc.text(title, 14, 15);
             
+            // Add date range
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text(dateRange, 14, 22);
+            
             // Add table
             doc.autoTable({
                 head: [['Date', 'Expense Name', 'Time', 'Amount']],
                 body: tableData,
-                startY: 25,
+                startY: 30,
                 theme: 'grid',
                 headStyles: {
                     fillColor: [67, 97, 238],
@@ -807,14 +1145,154 @@
             const total = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
             const finalY = doc.lastAutoTable.finalY || 25;
             doc.setFontSize(12);
+            doc.setTextColor(0);
             doc.text(`Total: $${total.toFixed(2)}`, 14, finalY + 10);
             
             // Save the PDF
             doc.save(`expense-report-${period}-${new Date().toISOString().slice(0, 10)}.pdf`);
         }
 
+        // Set language
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Update UI text based on selected language
+            if (lang === 'hi') {
+                // Hindi translations
+                document.querySelector('header h1').innerHTML = '<i class="fas fa-wallet"></i> खर्च ट्रैकर';
+                document.querySelector('header p').textContent = 'अपने खर्चों को ट्रैक करें, अपने बजट का प्रबंधन करें, और रिपोर्ट डाउनलोड करें';
+                document.querySelector('.card-title').textContent = 'खर्च जोड़ें';
+                document.querySelectorAll('.form-group label')[0].textContent = 'तारीख';
+                document.querySelectorAll('.form-group label')[1].textContent = 'खर्च का नाम';
+                document.querySelector('#name').placeholder = 'खर्च का नाम दर्ज करें';
+                document.querySelectorAll('.form-group label')[2].textContent = 'समय';
+                document.querySelectorAll('.form-group label')[3].textContent = 'राशि ($)';
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-plus"></i> खर्च जोड़ें';
+                document.querySelectorAll('.card-title')[1].textContent = 'खर्च रिकॉर्ड';
+                document.querySelectorAll('.tab-btn')[0].textContent = 'सभी';
+                document.querySelectorAll('.tab-btn')[1].textContent = 'सप्ताह';
+                document.querySelectorAll('.tab-btn')[2].textContent = 'महीना';
+                document.querySelectorAll('.summary-card h3')[0].textContent = 'साप्ताहिक खर्च';
+                document.querySelectorAll('.summary-card h3')[1].textContent = 'मासिक खर्च';
+                document.querySelectorAll('.summary-card h3')[2].textContent = 'कुल खर्च';
+                document.querySelector('#empty-state h3').textContent = 'अभी तक कोई खर्च दर्ज नहीं हुआ है';
+                document.querySelector('#empty-state p').textContent = 'शुरू करने के लिए अपना पहला खर्च जोड़ें';
+                document.querySelector('.modal-title').innerHTML = '<i class="fas fa-edit"></i> खर्च संपादित करें';
+                document.querySelectorAll('.form-group label')[4].textContent = 'तारीख';
+                document.querySelectorAll('.form-group label')[5].textContent = 'खर्च का नाम';
+                document.querySelector('#edit-name').placeholder = 'खर्च का नाम दर्ज करें';
+                document.querySelectorAll('.form-group label')[6].textContent = 'समय';
+                document.querySelectorAll('.form-group label')[7].textContent = 'राशि ($)';
+                document.querySelector('.btn-primary[type="submit"]').innerHTML = '<i class="fas fa-save"></i> परिवर्तन सहेजें';
+                document.querySelector('#cancel-edit').textContent = 'रद्द करें';
+                document.querySelector('footer p').textContent = '© 2023 खर्च ट्रैकर | उन्नत मासिक फ़िल्टर';
+                document.querySelector('#download-all').innerHTML = '<i class="fas fa-download"></i> वार्षिक पीडीएफ';
+                document.querySelector('#download-week').innerHTML = '<i class="fas fa-download"></i> साप्ताहिक पीडीएफ';
+                document.querySelector('#download-month').innerHTML = '<i class="fas fa-download"></i> मासिक पीडीएफ';
+            } else if (lang === 'gu') {
+                // Gujarati translations
+                document.querySelector('header h1').innerHTML = '<i class="fas fa-wallet"></i> ખર્ચ ટ્રેકર';
+                document.querySelector('header p').textContent = 'તમારા ખર્ચને ટ્રેક કરો, તમારા બજેટનું સંચાલન કરો અને અહેવાલો ડાઉનલોડ કરો';
+                document.querySelector('.card-title').textContent = 'ખર્ચ ઉમેરો';
+                document.querySelectorAll('.form-group label')[0].textContent = 'તારીખ';
+                document.querySelectorAll('.form-group label')[1].textContent = 'ખર્ચનું નામ';
+                document.querySelector('#name').placeholder = 'ખર્ચનું નામ દાખલ કરો';
+                document.querySelectorAll('.form-group label')[2].textContent = 'સમય';
+                document.querySelectorAll('.form-group label')[3].textContent = 'રકમ ($)';
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-plus"></i> ખર્ચ ઉમેરો';
+                document.querySelectorAll('.card-title')[1].textContent = 'ખર્ચ રેકોર્ડ્સ';
+                document.querySelectorAll('.tab-btn')[0].textContent = 'વર્ષ';
+                document.querySelectorAll('.tab-btn')[1].textContent = 'અઠવાડિયું';
+                document.querySelectorAll('.tab-btn')[2].textContent = 'માસિક';
+                document.querySelectorAll('.summary-card h3')[0].textContent = 'સાપ્તાહિક ખર્ચ';
+                document.querySelectorAll('.summary-card h3')[1].textContent = 'માસિક ખર્ચ';
+                document.querySelectorAll('.summary-card h3')[2].textContent = 'કુલ ખર્ચ';
+                document.querySelector('#empty-state h3').textContent = 'હજુ સુધી કોઈ ખર્ચ રેકોર્ડ નથી';
+                document.querySelector('#empty-state p').textContent = 'શરૂ કરવા માટે તમારું પ્રથમ ખર્ચ ઉમેરો';
+                document.querySelector('.modal-title').innerHTML = '<i class="fas fa-edit"></i> ખર્ચ સંપાદિત કરો';
+                document.querySelectorAll('.form-group label')[4].textContent = 'તારીખ';
+                document.querySelectorAll('.form-group label')[5].textContent = 'ખર્ચનું નામ';
+                document.querySelector('#edit-name').placeholder = 'ખર્ચનું નામ દાખલ કરો';
+                document.querySelectorAll('.form-group label')[6].textContent = 'સમય';
+                document.querySelectorAll('.form-group label')[7].textContent = 'રકમ ($)';
+                document.querySelector('.btn-primary[type="submit"]').innerHTML = '<i class="fas fa-save"></i> ફેરફારો સાચવો';
+                document.querySelector('#cancel-edit').textContent = 'રદ કરો';
+                document.querySelector('footer p').textContent = '© 2023 ખર્ચ ટ્રેકર | એન્હાન્સ્ડ માસિક ફિલ્ટર';
+                document.querySelector('#download-all').innerHTML = '<i class="fas fa-download"></i> વાર્ષિક PDF';
+                document.querySelector('#download-week').innerHTML = '<i class="fas fa-download"></i> સાપ્તાહિક PDF';
+                document.querySelector('#download-month').innerHTML = '<i class="fas fa-download"></i> માસિક PDF';
+            } else {
+                // English translations (default)
+                document.querySelector('header h1').innerHTML = '<i class="fas fa-wallet"></i> Expense Tracker';
+                document.querySelector('header p').textContent = 'Track your expenses, manage your budget, and download reports';
+                document.querySelector('.card-title').textContent = 'Add Expense';
+                document.querySelectorAll('.form-group label')[0].textContent = 'Date';
+                document.querySelectorAll('.form-group label')[1].textContent = 'Expense Name';
+                document.querySelector('#name').placeholder = 'Enter expense name';
+                document.querySelectorAll('.form-group label')[2].textContent = 'Time';
+                document.querySelectorAll('.form-group label')[3].textContent = 'Amount ($)';
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-plus"></i> Add Expense';
+                document.querySelectorAll('.card-title')[1].textContent = 'Expense Records';
+                document.querySelectorAll('.tab-btn')[0].textContent = 'All';
+                document.querySelectorAll('.tab-btn')[1].textContent = 'Week';
+                document.querySelectorAll('.tab-btn')[2].textContent = 'Month';
+                document.querySelectorAll('.summary-card h3')[0].textContent = 'Weekly Expenses';
+                document.querySelectorAll('.summary-card h3')[1].textContent = 'Monthly Expenses';
+                document.querySelectorAll('.summary-card h3')[2].textContent = 'Total Expenses';
+                document.querySelector('#empty-state h3').textContent = 'No expenses recorded yet';
+                document.querySelector('#empty-state p').textContent = 'Add your first expense to get started';
+                document.querySelector('.modal-title').innerHTML = '<i class="fas fa-edit"></i> Edit Expense';
+                document.querySelectorAll('.form-group label')[4].textContent = 'Date';
+                document.querySelectorAll('.form-group label')[5].textContent = 'Expense Name';
+                document.querySelector('#edit-name').placeholder = 'Enter expense name';
+                document.querySelectorAll('.form-group label')[6].textContent = 'Time';
+                document.querySelectorAll('.form-group label')[7].textContent = 'Amount ($)';
+                document.querySelector('.btn-primary[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                document.querySelector('#cancel-edit').textContent = 'Cancel';
+                document.querySelector('footer p').textContent = '© 2023 Expense Tracker | Enhanced Monthly Filter';
+                document.querySelector('#download-all').innerHTML = '<i class="fas fa-download"></i> Yearly PDF';
+                document.querySelector('#download-week').innerHTML = '<i class="fas fa-download"></i> Weekly PDF';
+                document.querySelector('#download-month').innerHTML = '<i class="fas fa-download"></i> Monthly PDF';
+            }
+            
+            // Update period labels
+            updatePeriodLabels();
+        }
+
+// Language dropdown functionality
+const langDropdown = document.querySelector('.lang-dropdown');
+const langCurrent = document.querySelector('.lang-current');
+const langOptions = document.querySelectorAll('.lang-option');
+
+langCurrent.addEventListener('click', () => {
+    langDropdown.classList.toggle('active');
+});
+
+langOptions.forEach(option => {
+    option.addEventListener('click', () => {
+        const lang = option.dataset.lang;
+        setLanguage(lang);
+        
+        // Update current language display
+        const flag = option.querySelector('.lang-flag').textContent;
+        const text = option.querySelector('.lang-text').textContent;
+        document.querySelector('.lang-current .lang-flag').textContent = flag;
+        document.querySelector('.lang-current .lang-text').textContent = text;
+        
+        langDropdown.classList.remove('active');
+    });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    if (!langDropdown.contains(e.target)) {
+        langDropdown.classList.remove('active');
+    }
+});
+
         // Event Listeners
         expenseForm.addEventListener('submit', addExpense);
+        downloadAllBtn.addEventListener('click', () => generatePDF('year'));
         downloadWeekBtn.addEventListener('click', () => generatePDF('week'));
         downloadMonthBtn.addEventListener('click', () => generatePDF('month'));
         
@@ -822,8 +1300,53 @@
             button.addEventListener('click', () => {
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
+                
+                // Show/hide month filter based on selected tab
+                if (button.dataset.tab === 'month') {
+                    monthFilterSection.style.display = 'block';
+                    updateMonthDisplay();
+                } else {
+                    monthFilterSection.style.display = 'none';
+                }
+                
+                // Show/hide PDF buttons based on selected tab
+                if (button.dataset.tab === 'all') {
+                    downloadAllBtn.style.display = 'flex';
+                    downloadWeekBtn.style.display = 'none';
+                    downloadMonthBtn.style.display = 'none';
+                } else if (button.dataset.tab === 'week') {
+                    downloadAllBtn.style.display = 'none';
+                    downloadWeekBtn.style.display = 'flex';
+                    downloadMonthBtn.style.display = 'none';
+                } else if (button.dataset.tab === 'month') {
+                    downloadAllBtn.style.display = 'none';
+                    downloadWeekBtn.style.display = 'none';
+                    downloadMonthBtn.style.display = 'flex';
+                }
+                
                 renderExpenses(button.dataset.tab);
             });
+        });
+        
+        // Month navigation
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateMonthDisplay();
+            renderExpenses('month');
+        });
+        
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateMonthDisplay();
+            renderExpenses('month');
         });
         
         // Edit form handling
@@ -837,10 +1360,25 @@
                 closeModal();
             }
         });
+        
+        // Language selector
+        langButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                langButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                setLanguage(button.dataset.lang);
+            });
+        });
 
         // Initial render
         renderExpenses();
         updateSummary();
+        updateMonthDisplay();
+        
+        // Set initial PDF button visibility
+        downloadAllBtn.style.display = 'flex';
+        downloadWeekBtn.style.display = 'none';
+        downloadMonthBtn.style.display = 'none';
     </script>
 </body>
 </html>
